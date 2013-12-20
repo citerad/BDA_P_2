@@ -1,0 +1,93 @@
+<Schema name="ubticket">
+  <Dimension type="TimeDimension" visible="true" highCardinality="false" name="Tiempo">
+    <Hierarchy visible="true" hasAll="false" primaryKey="ID_TIEMPO">
+      <Table name="D_TIEMPO" schema="public">
+      </Table>
+      <Level name="Anyo" visible="true" column="ID_ANYO" nameColumn="DESC_ANYO" type="Numeric" uniqueMembers="true" levelType="TimeYears" hideMemberIf="Never">
+      </Level>
+      <Level name="Trimestre" visible="true" column="ID_TRIMESTRE" nameColumn="DESC_TRIMESTRE" type="String" uniqueMembers="false" levelType="TimeQuarters" hideMemberIf="Never">
+      </Level>
+      <Level name="Mes" visible="true" column="ID_MES" nameColumn="DESC_MES" type="Numeric" uniqueMembers="false" levelType="TimeMonths" hideMemberIf="Never">
+      </Level>
+      <Level name="Dia" visible="true" column="ID_DIA" nameColumn="DESC_DIA" type="Numeric" uniqueMembers="false" levelType="TimeDays" hideMemberIf="Never">
+      </Level>
+    </Hierarchy>
+  </Dimension>
+  <Dimension type="StandardDimension" visible="true" highCardinality="false" name="Edad">
+    <Hierarchy visible="true" hasAll="true" allMemberName="Todas las edades" allLevelName="Todas las edades" primaryKey="ID_EDAD">
+      <Table name="D_EDAD" schema="public">
+      </Table>
+      <Level name="RangoEdad" visible="true" column="ID_RANGO_EDAD" nameColumn="DESC_RANGO_EDAD" type="Numeric" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
+      </Level>
+      <Level name="Edad" visible="true" column="ID_ANYOS_CUMPLIDOS" nameColumn="DESC_ANYOS_CUMPLIDOS" type="Numeric" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
+      </Level>
+    </Hierarchy>
+  </Dimension>
+  <Cube name="Ventas_Entradas" visible="true" cache="true" enabled="true">
+    <Table name="F_VENTAS_ENTRADAS" schema="public">
+    </Table>
+    <Dimension type="StandardDimension" visible="true" foreignKey="ID_CATEGORIA" highCardinality="false" name="Categoria">
+      <Hierarchy visible="true" hasAll="true" allMemberName="Todas las categorias" allLevelName="Todas las categorias">
+        <Table name="D_CATEGORIA" schema="public">
+        </Table>
+        <Level name="Nombre Categoria" visible="true" column="ID_CATEGORIA" nameColumn="DESC_CATEGORIA" type="String" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
+        </Level>
+      </Hierarchy>
+    </Dimension>
+    <Dimension type="StandardDimension" visible="true" foreignKey="ID_GEOGRAFIA" highCardinality="false" name="Geografia">
+      <Hierarchy visible="true" hasAll="true" allMemberName="Todas las CCAA" allLevelName="Todas las CCAA">
+        <Table name="D_GEOGRAFIA" schema="public">
+        </Table>
+        <Level name="Comunidad Autonoma" visible="true" column="ID_COMUNIDAD_AUTONOMA" nameColumn="DESC_COMUNIDAD_AUTONOMA" type="String" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
+        </Level>
+        <Level name="Comarca" visible="true" column="ID_COMARCA" nameColumn="DESC_COMARCA" type="String" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
+        </Level>
+      </Hierarchy>
+    </Dimension>
+    <Dimension type="StandardDimension" visible="true" foreignKey="ID_ESPECTACULO" highCardinality="false" name="Espectaculo">
+      <Hierarchy visible="true" hasAll="true" allMemberName="Todos los espectaculos" allLevelName="Todos los espectaculos">
+        <Table name="D_ESPECTACULO" schema="public">
+        </Table>
+        <Level name="Nombre Espectaculo" visible="true" column="ID_ESPECTACULO" nameColumn="DESC_ESPECTACULOS" type="String" uniqueMembers="false" levelType="Regular" hideMemberIf="Never">
+        </Level>
+      </Hierarchy>
+    </Dimension>
+    <Dimension type="StandardDimension" visible="true" foreignKey="ID_ESPACIO" highCardinality="false" name="Espacio">
+      <Hierarchy visible="true" hasAll="true" allMemberName="Todos los espacios" allLevelName="Todos los espacios" primaryKey="ID_ESPACIO">
+        <Table name="D_ESPACIO" schema="public">
+        </Table>
+        <Level name="Nombre Espacio" visible="true" column="ID_ESPACIO" nameColumn="DESC_ESPACIO" type="String" uniqueMembers="true" levelType="Regular" hideMemberIf="Never">
+          <Property name="Aforo" column="AFORO" type="Numeric">
+          </Property>
+        </Level>
+      </Hierarchy>
+    </Dimension>
+    <DimensionUsage source="Tiempo" name="Tiempo" visible="true" foreignKey="ID_TIEMPO" highCardinality="false">
+    </DimensionUsage>
+    <DimensionUsage source="Edad" name="Edad" visible="true" foreignKey="ID_EDAD" highCardinality="false">
+    </DimensionUsage>
+    <Dimension type="StandardDimension" visible="true" foreignKey="ID_USUARIO" highCardinality="false" name="Usuario">
+      <Hierarchy visible="true" hasAll="true" allMemberName="Todos los usuarios" allLevelName="Todos los usuarios" primaryKey="ID_USUARIO">
+        <Table name="D_USUARIO" schema="public">
+        </Table>
+        <Level name="Nombre usuario" visible="true" column="ID_USUARIO" nameColumn="DESC_USUARIO" type="String" uniqueMembers="false" levelType="Regular" hideMemberIf="Never">
+          <Property name="Nickname" column="LOGIN" type="String">
+          </Property>
+          <Property name="Tipo" column="TIPO_USUARIO" type="String">
+          </Property>
+        </Level>
+      </Hierarchy>
+    </Dimension>
+    <Measure name="Entradas Ingresos" column="CANTIDAD_INGRESO" aggregator="sum" visible="true">
+    </Measure>
+    <Measure name="Entradas Vendidas" column="CANTIDAD_VENTAS" aggregator="sum" visible="true">
+    </Measure>
+    <Measure name="Costo Mantenimiento" column="COSTO_MANTENIMIENTO" aggregator="sum" visible="true">
+    </Measure>
+    <CalculatedMember name="Ganancia" dimension="Measures" visible="true">
+      <Formula>
+        <![CDATA[[Measures].[Entradas Ingresos] - [Measures].[Costo Mantenimiento]]]>
+      </Formula>
+    </CalculatedMember>
+  </Cube>
+</Schema>
